@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Album Insight</title>
+    <link rel="stylesheet" href="{% static 'music_albums/style.css' %}">
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="container">
+            <a href="{% url 'album_list' %}" class="site-title">Album Insight</a>
+            <div class="nav-links">
+                <!-- Add other nav links here if needed -->
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

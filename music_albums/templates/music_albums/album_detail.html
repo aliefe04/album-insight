@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ album.title }}</h1>
+  {% if album.cover_image_url %}
+    <img src="{{ album.cover_image_url }}" alt="{{ album.title }} cover" style="max-width: 300px; height: auto;">
+  {% endif %}
+  <p><strong>Artist:</strong> {{ album.artist }}</p>
+  <p><strong>Release Year:</strong> {{ album.release_year }}</p>
+  <p><strong>Genre:</strong> <a href="{% url 'albums_by_genre' album.genre %}">{{ album.genre }}</a></p>
+  <p><strong>Average Rating:</strong> {{ album.average_rating|floatformat:1|default:"Not yet rated" }} / 5</p>
+
+  <h2>Reviews</h2>
+
+  <div>
+    Sort by: 
+    <a href="?sort=-created_at{% if reviews.has_other_pages %}&page={{ reviews.number }}{% endif %}" {% if current_sort == '-created_at' %}style="font-weight:bold;"{% endif %}>Newest</a> |
+    <a href="?sort=created_at{% if reviews.has_other_pages %}&page={{ reviews.number }}{% endif %}" {% if current_sort == 'created_at' %}style="font-weight:bold;"{% endif %}>Oldest</a> |
+    <a href="?sort=-rating{% if reviews.has_other_pages %}&page={{ reviews.number }}{% endif %}" {% if current_sort == '-rating' %}style="font-weight:bold;"{% endif %}>Highest Rating</a> |
+    <a href="?sort=rating{% if reviews.has_other_pages %}&page={{ reviews.number }}{% endif %}" {% if current_sort == 'rating' %}style="font-weight:bold;"{% endif %}>Lowest Rating</a>
+  </div>
+
+  {% if reviews %}
+    <ul>
+      {% for review in reviews %}
+        <li>
+          <p><strong>{{ review.reviewer_name }}</strong> (Rating: {{ review.rating }}/5)</p>
+          <p>{{ review.comment }}</p>
+          <small>Posted on: {{ review.created_at|date:"Y-m-d H:i" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if reviews.has_previous %}
+                <a href="?page=1{% if current_sort %}&sort={{ current_sort }}{% endif %}">&laquo; first</a>
+                <a href="?page={{ reviews.previous_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}.
+            </span>
+
+            {% if reviews.has_next %}
+                <a href="?page={{ reviews.next_page_number }}{% if current_sort %}&sort={{ current_sort }}{% endif %}">next</a>
+                <a href="?page={{ reviews.paginator.num_pages }}{% if current_sort %}&sort={{ current_sort }}{% endif %}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+  {% else %}
+    <p>No reviews yet.</p>
+  {% endif %}
+
+  <h2>Add a Review</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Review</button>
+  </form>
+{% endblock %}
